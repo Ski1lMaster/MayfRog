@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
+        Instance = this;
     }
 
     private void FixedUpdate()
