@@ -1,13 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private float speed = 3f; //Скорость движения
-    [SerializeField] private int lives = 2; //Количество жизней
+    [SerializeField] private int health; //Количество жизней
     [SerializeField] private float jumpForce = 5f; //Сила прыжка
     private bool isGrounded = false;
+
+    [SerializeField] private Image[] hearts;
+
+    [SerializeField] private Sprite aliveHeart;
+    [SerializeField] private Sprite deadHeart;
 
     private Rigidbody2D rb;
     private SpriteRenderer sprite;
@@ -16,6 +22,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        health = 1;
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponentInChildren<SpriteRenderer>();
         Instance = this;
@@ -26,12 +33,33 @@ public class Player : MonoBehaviour
         CheckGround();
     }
 
+    public void Die()
+    {
+        Destroy(this.gameObject);
+    }
+
     private void Update()
     {
         if (Input.GetButton("Horizontal"))
             Run();
         if (isGrounded && Input.GetButtonDown("Jump"))
             Jump();
+
+        if (health > health)
+            health = health;
+        
+        for (int i=0; i < hearts.Length; i++)
+        {
+            if (i < health)
+                hearts[i].sprite = aliveHeart;
+            else
+                hearts[i].sprite = deadHeart;
+
+            if (i < health)
+                hearts[i].enabled = true;
+            else
+                hearts[i].enabled = false;
+        }
     }
 
     private void Run()
@@ -56,7 +84,12 @@ public class Player : MonoBehaviour
 
     public void GetDamage()
     {
-        lives -= 1;
-        Debug.Log(lives);
+        health -= 1;
+        if (health == 0)
+        {
+            foreach (var h in hearts)
+                h.sprite = deadHeart;
+            Die();
+        }
     }
 }
